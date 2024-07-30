@@ -2,18 +2,13 @@
 
 .container {
   width: 1100px;
-  /* background-color: #f4f4f4;
-  border: #008f71 2px solid;
-  text-align: center;
-  padding: 24px 40px;
-  border-radius: 8px; */
 }
 
 .error {
   color: rgb(213, 0, 0);
 }
 
-.input_wrapper {
+/* .input_wrapper {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -38,12 +33,13 @@
 .get_button:hover {
   background-color: rgb(255, 255, 255, 0.8);
   transition: 0.2s ease-in;
-}
+} */
 
 .main_container {
   display: flex;
   flex-direction: row;
   height: 180px;
+  position: relative;
 }
 
 .main_city_name {
@@ -65,8 +61,11 @@
   font-size: 102px;
   color: white;
   background-color: #008f71;
-  padding: 8px 8px 0 16px;
-  align-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  aspect-ratio: 1/1;
 }
 
 .info_table {
@@ -169,4 +168,17 @@
   width: 100%;
   height: 2px;
   background-color: #008f71;
+}
+
+.sticker {
+  position: absolute;
+  background: white;
+  border: solid 2px #008f71;
+  padding: 20px 24px;
+  border-radius: 160px / 70px;
+  color: #008f71;
+  font-size: 20px;
+  transform: rotate(-26deg);
+  top: -30px;
+  left: -60px;
 }

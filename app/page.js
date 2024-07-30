@@ -5,106 +5,122 @@ import styles from "./page.module.css";
 
 export default function Home() {
   const [city, setCity] = useState("taipei");
-  const [weatherData, setWeatherData] = useState(null);
+  const [currentWeather, setCurrentWeather] = useState(null);
+  const [forecast, setForecast] = useState(null);
   const [error, setError] = useState("");
 
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
   const taipei_lon = 121.5319;
   const taipei_lat = 25.0478;
 
-  // 範例
-  // const testData = {
-  //   list: [
-  //     {
-  //       dt: 1722200400,
-  //       main: {
-  //         temp: 28.05, // 溫度
-  //         feels_like: 31.32, // 體感溫度
-  //         temp_min: 26.38,
-  //         temp_max: 28.05,
-  //         pressure: 1009,
-  //         sea_level: 1009,
-  //         grnd_level: 1006,
-  //         humidity: 74, // 濕度
-  //         temp_kf: 1.67,
-  //       },
-  //       weather: [
-  //         {
-  //           id: 803,
-  //           main: "Clouds", // 狀況
-  //           description: "broken clouds", // 狀況詳細
-  //           icon: "04n",
-  //         },
-  //       ],
-  //       clouds: {
-  //         all: 82,
-  //       },
-  //       wind: {
-  //         speed: 2.69,
-  //         deg: 121,
-  //         gust: 6.15,
-  //       },
-  //       visibility: 10000,
-  //       pop: 0,
-  //       sys: {
-  //         pod: "n",
-  //       },
-  //       dt_txt: "2024-07-28 21:00:00", // 日期時間
-  //     },
-  //     {
-  //       dt: 1722211200,
-  //       main: {
-  //         temp: 29.15,
-  //         feels_like: 33.25,
-  //         temp_min: 29.15,
-  //         temp_max: 29.28,
-  //         pressure: 1008,
-  //         sea_level: 1008,
-  //         grnd_level: 1006,
-  //         humidity: 71,
-  //         temp_kf: -0.13,
-  //       },
-  //       weather: [
-  //         {
-  //           id: 803,
-  //           main: "Clouds",
-  //           description: "broken clouds",
-  //           icon: "04d",
-  //         },
-  //       ],
-  //       clouds: {
-  //         all: 84,
-  //       },
-  //       wind: {
-  //         speed: 3.81,
-  //         deg: 128,
-  //         gust: 7.12,
-  //       },
-  //       visibility: 10000,
-  //       pop: 0,
-  //       sys: {
-  //         pod: "d",
-  //       },
-  //       dt_txt: "2024-07-29 00:00:00",
-  //     },
-  //   ],
-  // };
-
   useEffect(() => {
-    async function fetchTaipeiData() {
+    const fetchAllData = async () => {
       try {
-        const response = await fetch(
+        // 當下資料
+        const currentResponse = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?lat=${taipei_lat}&lon=${taipei_lon}&units=metric&appid=${API_KEY}`
+        );
+        if (!currentResponse.ok) {
+          throw new Error("Failed to fetch currentData");
+        }
+        const currentData = await currentResponse.json();
+        setCurrentWeather(currentData);
+        // console.log(currentData);
+
+        // 預報資料
+        const forecastResponse = await fetch(
           `https://api.openweathermap.org/data/2.5/forecast?lat=${taipei_lat}&lon=${taipei_lon}&units=metric&appid=${API_KEY}`
         );
-        const data = await response.json();
-        setWeatherData(data);
-        console.log(data);
-      } catch (error) {
-        console.error("Error fetching TaipeiData");
+        if (!forecastResponse.ok) {
+          throw new Error("Failed to fetch forecastData");
+        }
+        const forecastData = await forecastResponse.json();
+        console.log("Raw forecast data:", forecastData);
+        const processedData = processForecastData(forecastData);
+        console.log("Processed forecast data:", processedData);
+        setForecast(processedData);
+      } catch (err) {
+        setError(err.message);
       }
-    }
-    // fetchTaipeiData();
+    };
+
+    fetchAllData();
   }, [API_KEY]);
+
+  // 整理資料的函數
+  function processForecastData(data) {
+    const days = {};
+
+    data.list.forEach((item) => {
+      const dateObj = new Date(item.dt * 1000);
+      const day = dateObj.getDate();
+      const month = dateObj.getMonth() + 1;
+      const weekday = dateObj
+        .toLocaleDateString("en-US", { weekday: "short" })
+        .toUpperCase();
+      const date = `${month}/${day}(${weekday})`;
+
+      console.log(date);
+
+      if (!days[date]) {
+        // 如果還不存在，初始化
+        days[date] = {
+          minTemp: Math.round(item.main.temp_min),
+          maxTemp: Math.round(item.main.temp_max),
+          humidity: Math.round(item.main.humidity),
+          weather: item.weather[0].main,
+          icon: item.weather[0].icon,
+          weatherCount: {},
+          iconCount: {},
+        };
+      } else {
+        // 如果已經存在，更新
+        days[date].minTemp = Math.min(
+          days[date].minTemp,
+          Math.round(item.main.temp_min)
+        );
+        days[date].maxTemp = Math.max(
+          days[date].maxTemp,
+          Math.round(item.main.temp_max)
+        );
+        days[date].humidity = Math.round(
+          (days[date].humidity + item.main.humidity) / 2
+        );
+      }
+
+      // 計數天氣描述和圖標
+      const weather = item.weather[0].main;
+      const icon = item.weather[0].icon;
+      if (!days[date].weatherCount[weather]) {
+        days[date].weatherCount[weather] = 1;
+      } else {
+        days[date].weatherCount[weather]++;
+      }
+      if (!days[date].iconCount[icon]) {
+        days[date].iconCount[icon] = 1;
+      } else {
+        days[date].iconCount[icon]++;
+      }
+    });
+
+    return Object.entries(days).map(([date, values]) => {
+      const mostCommonWeather = Object.keys(values.weatherCount).reduce(
+        (a, b) => (values.weatherCount[a] > values.weatherCount[b] ? a : b)
+      );
+      const mostCommonIcon = Object.keys(values.iconCount).reduce((a, b) =>
+        values.iconCount[a] > values.iconCount[b] ? a : b
+      );
+
+      return {
+        date,
+        minTemp: values.minTemp,
+        maxTemp: values.maxTemp,
+        humidity: values.humidity,
+        weather: mostCommonWeather,
+        icon: mostCommonIcon,
+      };
+    });
+  }
 
   // 更改地點的函數
   const getWeather = async () => {};
@@ -113,46 +129,62 @@ export default function Home() {
     <>
       <div className={styles.container}>
         {/* 容器一 */}
-        <div className={styles.main_container}>
-          <p className={styles.main_temp}>18°</p>
-          <p className={styles.main_city_name}>Taipei</p>
-          <div className={styles.today_info}>
-            <table className={styles.info_table}>
-              <tr>
-                <td className={`${styles.table_td} ${styles.table_field}`}>
-                  最低
-                </td>
-                <td className={`${styles.table_td} ${styles.table_content}`}>
-                  22°
-                </td>
-              </tr>
-              <tr>
-                <td className={`${styles.table_td} ${styles.table_field}`}>
-                  最高
-                </td>
-                <td className={`${styles.table_td} ${styles.table_content}`}>
-                  28°
-                </td>
-              </tr>
-              <tr>
-                <td className={`${styles.table_td} ${styles.table_field}`}>
-                  濕度
-                </td>
-                <td className={`${styles.table_td} ${styles.table_content}`}>
-                  55°
-                </td>
-              </tr>
-              <tr>
-                <td className={`${styles.table_td} ${styles.table_field}`}>
-                  天氣描述
-                </td>
-                <td className={`${styles.table_td} ${styles.table_content}`}>
-                  Clouds
-                </td>
-              </tr>
-            </table>
+        {currentWeather && (
+          <div className={styles.main_container}>
+            <span className={styles.sticker}>TEMP NOW</span>
+            {/* TODO: 四捨五入 */}
+            <p className={styles.main_temp}>{currentWeather.main.temp}</p>
+            <p className={styles.main_city_name}>{currentWeather.name}</p>
+            <div>
+              <table className={styles.info_table}>
+                <thead></thead>
+                <tbody>
+                  <tr>
+                    <td className={`${styles.table_td} ${styles.table_field}`}>
+                      Low Temp
+                    </td>
+                    <td
+                      className={`${styles.table_td} ${styles.table_content}`}
+                    >
+                      {currentWeather.main.temp_min}°
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className={`${styles.table_td} ${styles.table_field}`}>
+                      High Temp
+                    </td>
+                    <td
+                      className={`${styles.table_td} ${styles.table_content}`}
+                    >
+                      {currentWeather.main.temp_max}°
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className={`${styles.table_td} ${styles.table_field}`}>
+                      Humidity
+                    </td>
+                    <td
+                      className={`${styles.table_td} ${styles.table_content}`}
+                    >
+                      {currentWeather.main.humidity}%
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className={`${styles.table_td} ${styles.table_field}`}>
+                      Condition
+                    </td>
+                    <td
+                      className={`${styles.table_td} ${styles.table_content}`}
+                    >
+                      Clouds
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        )}
+
         {/* 容器二 */}
         <div className={styles.subtitle_container}>
           <span className={styles.sub_divider}></span>
@@ -161,104 +193,44 @@ export default function Home() {
           </span>
           <span className={styles.sub_divider}></span>
         </div>
+
         {/* 容器三 */}
-        <div className={styles.card_container}>
-          <div className={styles.card}>
-            <p className={styles.card_date}>7/30(MON)</p>
-            <div className={styles.card_main_info}>
-              <div className={styles.card_bg}>
-                <Image
-                  src="/img_weather_01.svg"
-                  alt="Weather icon"
-                  width={80}
-                  height={80}
-                  className={styles.card_icon}
-                ></Image>
+        {forecast && (
+          <div className={styles.card_container}>
+            {forecast.map((day, i) => (
+              <div className={styles.card} key={i}>
+                <p className={styles.card_date}>{forecast[i].date}</p>
+                <div className={styles.card_main_info}>
+                  <div className={styles.card_bg}>
+                    <Image
+                      src="/img_weather_01.svg"
+                      alt="Weather icon"
+                      width={80}
+                      height={80}
+                      className={styles.card_icon}
+                    ></Image>
+                  </div>
+                  <p className={styles.card_paragraph}>
+                    {forecast[i].minTemp}°
+                    <span className={styles.text_divider}></span>
+                    {forecast[i].maxTemp}°
+                  </p>
+                  <p className={styles.card_sm_paragraph}>
+                    {forecast[i].weather}
+                  </p>
+                </div>
               </div>
-              <p className={styles.card_paragraph}>
-                22°<span className={styles.text_divider}></span>28°
-              </p>
-              <p className={styles.card_sm_paragraph}>Clouds</p>
-            </div>
+            ))}
           </div>
-          <div className={styles.card}>
-            <p className={styles.card_date}>7/30(MON)</p>
-            <div className={styles.card_main_info}>
-              <div className={styles.card_bg}>
-                <Image
-                  src="/img_weather_01.svg"
-                  alt="Weather icon"
-                  width={80}
-                  height={80}
-                  className={styles.card_icon}
-                ></Image>
-              </div>
-              <p className={styles.card_paragraph}>
-                22°<span className={styles.text_divider}></span>28°
-              </p>
-              <p className={styles.card_sm_paragraph}>Clouds</p>
-            </div>
-          </div>
-          <div className={styles.card}>
-            <p className={styles.card_date}>7/30(MON)</p>
-            <div className={styles.card_main_info}>
-              <div className={styles.card_bg}>
-                <Image
-                  src="/img_weather_01.svg"
-                  alt="Weather icon"
-                  width={80}
-                  height={80}
-                  className={styles.card_icon}
-                ></Image>
-              </div>
-              <p className={styles.card_paragraph}>
-                22°<span className={styles.text_divider}></span>28°
-              </p>
-              <p className={styles.card_sm_paragraph}>Clouds</p>
-            </div>
-          </div>
-          <div className={styles.card}>
-            <p className={styles.card_date}>7/30(MON)</p>
-            <div className={styles.card_main_info}>
-              <div className={styles.card_bg}>
-                <Image
-                  src="/img_weather_01.svg"
-                  alt="Weather icon"
-                  width={80}
-                  height={80}
-                  className={styles.card_icon}
-                ></Image>
-              </div>
-              <p className={styles.card_paragraph}>
-                22°<span className={styles.text_divider}></span>28°
-              </p>
-              <p className={styles.card_sm_paragraph}>Clouds</p>
-            </div>
-          </div>
-          <div className={styles.card}>
-            <p className={styles.card_date}>7/30(MON)</p>
-            <div className={styles.card_main_info}>
-              <div className={styles.card_bg}>
-                <Image
-                  src="/img_weather_01.svg"
-                  alt="Weather icon"
-                  width={80}
-                  height={80}
-                  className={styles.card_icon}
-                ></Image>
-              </div>
-              <p className={styles.card_paragraph}>
-                22°<span className={styles.text_divider}></span>28°
-              </p>
-              <p className={styles.card_sm_paragraph}>Clouds</p>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
+
       {/* 錯誤提醒 */}
-      {/* <div className={styles.container}>
-        <p className="styles.error">{error}</p>
-      </div> */}
+      {error && (
+        <div className={styles.container}>
+          <p className="styles.error">{error}</p>
+        </div>
+      )}
     </>
   );
 }
