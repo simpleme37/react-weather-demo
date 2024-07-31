@@ -19,4 +19,11 @@
 ## Preview
 <a href="public/img-weather-preview.png" target="_blank">
   <img src="public/img-weather-preview.png" alt="Weather Preview" style="width: 400px; height: auto;">
-</a>
+</a><br>
+<a href="public/img-weather-preview-md.png" target="_blank">
+  <img src="public/img-weather-preview-md.png" alt="Weather Preview" style="width: 300px; height: auto;">
+</a><br>
+<a href="public/img-weather-preview-sm.png" target="_blank">
+  <img src="public/img-weather-preview-sm.png" alt="Weather Preview" style="width: 200px; height: auto;">
+</a><br>
+
