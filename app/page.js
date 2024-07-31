@@ -60,7 +60,7 @@ export default function Home() {
       const weekday = dateObj
         .toLocaleDateString("en-US", { weekday: "short" })
         .toUpperCase();
-      const date = `${month}/${day}(${weekday})`;
+      const date = `${month}/${day} (${weekday})`;
 
       console.log(date);
 

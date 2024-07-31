@@ -1,7 +1,8 @@
-@import url("https://fonts.googleapis.com/css2?family=Zilla+Slab:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap");
 
 .container {
   width: 1100px;
+  font-family: "Merriweather", serif;
 }
 
 .error {
@@ -13,23 +14,26 @@
   flex-direction: row;
   height: 180px;
   position: relative;
+  width: 100%;
 }
 .main_city_name {
   width: 100%;
-  font-family: "Zilla Slab", serif;
-  font-size: 102px;
-  font-weight: 500;
+  font-size: 96px;
+  font-weight: 800;
   letter-spacing: 0.2rem;
   color: white;
   -webkit-text-stroke: 2px #008f71;
   border: solid 2px #008f71;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: block;
+  padding: 24px 24px;
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .main_temp {
-  font-family: "Zilla Slab", serif;
-  font-size: 102px;
+  font-weight: 500;
+  font-size: 96px;
   color: white;
   background-color: #008f71;
   display: flex;
@@ -37,6 +41,7 @@
   justify-content: center;
   height: 100%;
   aspect-ratio: 1/1;
+  padding: 0 0 0 8px;
 }
 
 .info_table {
@@ -49,11 +54,13 @@
 .table_td {
   padding: 0px 12px;
   font-size: 18px;
+  letter-spacing: 0.1rem;
   text-wrap: nowrap;
 }
 .table_field {
   color: white;
   background-color: #008f71;
+  font-weight: 100;
 }
 .table_content {
   color: #008f71;
@@ -105,6 +112,7 @@
   justify-content: center;
   font-size: 24px;
   padding: 16px 0;
+  font-weight: 100;
 }
 .card_main_info {
   padding: 24px 16px;
@@ -154,6 +162,7 @@
   border-radius: 160px / 70px;
   color: #008f71;
   font-size: 20px;
+  font-weight: 600;
   transform: rotate(-26deg);
   top: -30px;
   left: -60px;
