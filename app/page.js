@@ -24,8 +24,10 @@ export default function Home() {
           throw new Error("Failed to fetch currentData");
         }
         const currentData = await currentResponse.json();
-        setCurrentWeather(currentData);
-        // console.log(currentData);
+        console.log("Current data:", currentData); // 檢查
+        const processedCurrentData = processCurrentData(currentData);
+        console.log("Processed Current data:", processedCurrentData); // 檢查
+        setCurrentWeather(processedCurrentData);
 
         // 預報資料
         const forecastResponse = await fetch(
@@ -35,9 +37,9 @@ export default function Home() {
           throw new Error("Failed to fetch forecastData");
         }
         const forecastData = await forecastResponse.json();
-        console.log("Raw forecast data:", forecastData);
+        console.log("Raw forecast data:", forecastData); // 檢查
         const processedData = processForecastData(forecastData);
-        console.log("Processed forecast data:", processedData);
+        console.log("Processed forecast data:", processedData); // 檢查
         setForecast(processedData);
       } catch (err) {
         setError(err.message);
@@ -47,7 +49,7 @@ export default function Home() {
     fetchAllData();
   }, [API_KEY]);
 
-  // 整理資料的函數
+  // 整理 forecastData 的函數
   function processForecastData(data) {
     const days = {};
 
@@ -90,7 +92,7 @@ export default function Home() {
 
       // 計數天氣描述和圖標
       const weather = item.weather[0].main;
-      const icon = item.weather[0].icon;
+      const icon = item.weather[0].icon.slice(0, -1);
       if (!days[date].weatherCount[weather]) {
         days[date].weatherCount[weather] = 1;
       } else {
@@ -122,19 +124,42 @@ export default function Home() {
     });
   }
 
+  // 整理 currentData 的函數
+  // function processCurrentData(data) {
+  //   return {
+  //     ...data,
+  //     main: {
+  //       ...data.main,
+  //       temp: Math.round(data.main.temp),
+  //       temp_max: Math.round(data.main.temp_max),
+  //       temp_min: Math.round(data.main.temp_min),
+  //     },
+  //   };
+  // }
+
+  function processCurrentData(data) {
+    return {
+      city: data.name,
+      temp: Math.round(data.main.temp),
+      temp_min: Math.round(data.main.temp_min),
+      temp_max: Math.round(data.main.temp_max),
+      humidity: data.main.humidity,
+      weather: data.weather[0].main,
+    };
+  }
+
   // 更改地點的函數
   const getWeather = async () => {};
 
   return (
     <>
       <div className={styles.container}>
-        {/* 容器一 */}
+        {/* 區塊一 */}
         {currentWeather && (
           <div className={styles.main_container}>
             <span className={styles.sticker}>TEMP NOW</span>
-            {/* TODO: 四捨五入 */}
-            <p className={styles.main_temp}>{currentWeather.main.temp}</p>
-            <p className={styles.main_city_name}>{currentWeather.name}</p>
+            <p className={styles.main_temp}>{currentWeather.temp}°</p>
+            <p className={styles.main_city_name}>{currentWeather.city}</p>
             <div>
               <table className={styles.info_table}>
                 <thead></thead>
@@ -146,7 +171,7 @@ export default function Home() {
                     <td
                       className={`${styles.table_td} ${styles.table_content}`}
                     >
-                      {currentWeather.main.temp_min}°
+                      {currentWeather.temp_min}°
                     </td>
                   </tr>
                   <tr>
@@ -156,7 +181,7 @@ export default function Home() {
                     <td
                       className={`${styles.table_td} ${styles.table_content}`}
                     >
-                      {currentWeather.main.temp_max}°
+                      {currentWeather.temp_max}°
                     </td>
                   </tr>
                   <tr>
@@ -166,7 +191,7 @@ export default function Home() {
                     <td
                       className={`${styles.table_td} ${styles.table_content}`}
                     >
-                      {currentWeather.main.humidity}%
+                      {currentWeather.humidity}%
                     </td>
                   </tr>
                   <tr>
@@ -176,7 +201,7 @@ export default function Home() {
                     <td
                       className={`${styles.table_td} ${styles.table_content}`}
                     >
-                      Clouds
+                      {currentWeather.weather}
                     </td>
                   </tr>
                 </tbody>
@@ -185,16 +210,16 @@ export default function Home() {
           </div>
         )}
 
-        {/* 容器二 */}
+        {/* 區塊二 */}
         <div className={styles.subtitle_container}>
           <span className={styles.sub_divider}></span>
           <span className={styles.subtitle}>
-            Weather Forecast for the Next Five Days
+            Next Few Days Weather Forecast
           </span>
           <span className={styles.sub_divider}></span>
         </div>
 
-        {/* 容器三 */}
+        {/* 區塊三 */}
         {forecast && (
           <div className={styles.card_container}>
             {forecast.map((day, i) => (
@@ -203,7 +228,7 @@ export default function Home() {
                 <div className={styles.card_main_info}>
                   <div className={styles.card_bg}>
                     <Image
-                      src="/img_weather_01.svg"
+                      src={`/icons/${forecast[i].icon}.png`}
                       alt="Weather icon"
                       width={80}
                       height={80}
