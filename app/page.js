@@ -4,14 +4,20 @@ import React, { useState, useEffect } from "react";
 import styles from "./page.module.css";
 
 export default function Home() {
-  const [city, setCity] = useState("taipei");
+  // const [city, setCity] = useState("taipei");
   const [currentWeather, setCurrentWeather] = useState(null);
   const [forecast, setForecast] = useState(null);
   const [error, setError] = useState("");
+  const [jumping, setJumping] = useState(null);
 
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
   const taipei_lon = 121.5319;
   const taipei_lat = 25.0478;
+
+  const handleIconClick = (index) => {
+    setJumping(index);
+    setTimeout(() => setJumping(null), 500); // 動畫結束後移除類
+  };
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -232,7 +238,10 @@ export default function Home() {
                       alt="Weather icon"
                       width={80}
                       height={80}
-                      className={styles.card_icon}
+                      className={`${styles.card_icon} ${
+                        jumping === i ? styles.jump : ""
+                      }`}
+                      onClick={() => handleIconClick(i)}
                     ></Image>
                   </div>
                   <p className={styles.card_paragraph}>
