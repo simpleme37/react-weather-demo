@@ -93,7 +93,7 @@ body {
   color: rgb(var(--foreground-rgb));
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   height: 100vh;
   background-color: #f4f4f4;
 }
@@ -106,5 +106,11 @@ a {
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    align-items: center;
   }
 }
