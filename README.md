@@ -9,4 +9,9 @@
 
 ## Technologies
 
-- JSX, CSS, JavaScript, React, Next.js, OpenWeather API
+- JSX
+- CSS
+- JavaScript
+- React
+- Next.js
+- OpenWeather API
