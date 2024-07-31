@@ -15,3 +15,8 @@
 - React
 - Next.js
 - OpenWeather API
+
+## Preview
+<a href="public/img-weather-preview.png" target="_blank">
+  <img src="public/img-weather-preview.png" alt="Weather Preview" style="width: 400px; height: auto;">
+</a>
