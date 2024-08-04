@@ -48,6 +48,7 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  cursor: pointer;
 }
 .main_temp {
   font-weight: 500;
@@ -189,6 +190,92 @@
   transform: rotate(-26deg);
   top: -30px;
   left: -60px;
+}
+
+/* Modal */
+.modal_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  width: 400px;
+  background: white;
+  padding: 32px;
+  border-radius: 8px;
+}
+
+.modal_title {
+  color: #008f71;
+  font-size: 24px;
+}
+
+.button_wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
+.modal_button_bg {
+  background-color: #008f71;
+  color: white;
+  font-weight: 300;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.modal_button_bg:hover {
+  background-color: #01a27f;
+  transition: 0.2s ease;
+}
+
+.modal_button_border {
+  background-color: white;
+  color: #008f71;
+  border: solid #008f71 1px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.modal_button_border:hover {
+  background-color: rgb(239, 239, 239);
+  transition: 0.2s ease;
+}
+
+.custom_select {
+  width: 100%;
+}
+
+.styled_select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 16px;
+  margin-bottom: 24px;
+  border-radius: 4px;
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 12px;
+  font-size: 16px;
+}
+
+.styled_select:focus {
+  border-color: #008f71;
+  outline: none;
 }
 
 /* 大屏幕時的設置，顯示 5-6 張卡片 */

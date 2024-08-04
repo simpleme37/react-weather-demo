@@ -4,16 +4,47 @@ import React, { useState, useEffect } from "react";
 import styles from "./page.module.css";
 
 export default function Home() {
-  // const [city, setCity] = useState("taipei");
   const [currentWeather, setCurrentWeather] = useState(null);
   const [forecast, setForecast] = useState(null);
   const [error, setError] = useState("");
   const [jumping, setJumping] = useState(null);
 
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
-  const taipei_lon = 121.5319;
-  const taipei_lat = 25.0478;
 
+  const cityCoordinates = {
+    Taipei: { lat: 25.0478, lon: 121.5319 },
+    Taichung: { lat: 24.1477, lon: 120.6736 },
+    Tokyo: { lat: 35.6762, lon: 139.6503 },
+    Kanazawa: { lat: 36.5613, lon: 136.6562 },
+    Hokkaido: { lat: 43.064, lon: 141.346 },
+    Seoul: { lat: 37.5665, lon: 126.978 },
+    London: { lat: 51.5073, lon: -0.127 },
+    France: { lat: 48.856, lon: 2.352 },
+    Moscow: { lat: 55.755, lon: 37.617 },
+  };
+
+  const options = Object.keys(cityCoordinates);
+
+  // 彈窗變數設定
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
+  const [tempCity, setTempCity] = useState("Taipei");
+  const [selectedCity, setSelectedCity] = useState("Taipei");
+  const [coordinates, setCoordinates] = useState(cityCoordinates["Taipei"]);
+
+  const confirmCityChange = () => {
+    setSelectedCity(tempCity);
+    setCoordinates(cityCoordinates[tempCity]);
+    closeModal();
+  };
+
+  const handleCityChange = (event) => {
+    setTempCity(event.target.value);
+  };
+
+  // 彈跳動畫
   const handleIconClick = (index) => {
     setJumping(index);
     setTimeout(() => setJumping(null), 500); // 動畫結束後移除類
@@ -24,7 +55,7 @@ export default function Home() {
       try {
         // 當下資料
         const currentResponse = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${taipei_lat}&lon=${taipei_lon}&units=metric&appid=${API_KEY}`
+          `https://api.openweathermap.org/data/2.5/weather?lat=${coordinates.lat}&lon=${coordinates.lon}&units=metric&appid=${API_KEY}`
         );
         if (!currentResponse.ok) {
           throw new Error("Failed to fetch currentData");
@@ -37,7 +68,7 @@ export default function Home() {
 
         // 預報資料
         const forecastResponse = await fetch(
-          `https://api.openweathermap.org/data/2.5/forecast?lat=${taipei_lat}&lon=${taipei_lon}&units=metric&appid=${API_KEY}`
+          `https://api.openweathermap.org/data/2.5/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&units=metric&appid=${API_KEY}`
         );
         if (!forecastResponse.ok) {
           throw new Error("Failed to fetch forecastData");
@@ -53,7 +84,7 @@ export default function Home() {
     };
 
     fetchAllData();
-  }, [API_KEY]);
+  }, [coordinates]);
 
   // 整理 forecastData 的函數
   function processForecastData(data) {
@@ -154,9 +185,6 @@ export default function Home() {
     };
   }
 
-  // 更改地點的函數
-  const getWeather = async () => {};
-
   return (
     <>
       <div className={styles.container}>
@@ -165,7 +193,9 @@ export default function Home() {
           <div className={styles.main_container}>
             <span className={styles.sticker}>TEMP NOW</span>
             <p className={styles.main_temp}>{currentWeather.temp}°</p>
-            <p className={styles.main_city_name}>{currentWeather.city}</p>
+            <p className={styles.main_city_name} onClick={openModal}>
+              {selectedCity}
+            </p>
             <div>
               <table className={styles.info_table}>
                 <thead></thead>
@@ -263,6 +293,43 @@ export default function Home() {
       {error && (
         <div className={styles.container}>
           <p className="styles.error">{error}</p>
+        </div>
+      )}
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className={styles.modal_overlay}>
+          <div className={styles.modal}>
+            <p className={styles.modal_title}>Select City</p>
+            <div className={styles.custom_select}>
+              <select
+                name="cities"
+                value={tempCity}
+                onChange={handleCityChange}
+                className={styles.styled_select}
+              >
+                {options.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={styles.button_wrapper}>
+              <button
+                onClick={closeModal}
+                className={styles.modal_button_border}
+              >
+                Close
+              </button>
+              <button
+                className={styles.modal_button_bg}
+                onClick={confirmCityChange}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </>
