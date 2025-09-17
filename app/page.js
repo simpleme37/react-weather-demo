@@ -191,11 +191,13 @@ export default function Home() {
         <div className={styles.container}>
           {/* Loader */}
           {isLoading ? (
-            <div className={styles.lds_ellipsis}>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
+            <div className={styles.loading_container}>
+              <div className={styles.lds_ellipsis}>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
             </div>
           ) : (
             <div>

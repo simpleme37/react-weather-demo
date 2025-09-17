@@ -290,6 +290,11 @@
 }
 
 /* loader */
+.loading_container {
+  display: flex;
+  justify-content: center;
+}
+
 .lds_ellipsis,
 .lds_ellipsis div {
 }
