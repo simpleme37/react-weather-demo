@@ -17,10 +17,26 @@
   animation: jump 0.3s ease;
 }
 
+.viewport_center {
+  min-height: 100svh; /* 滿版高度 */
+  display: grid;
+  place-items: center; /* 水平 + 垂直置中 */
+  padding: 24px;
+}
+
+/* mobile */
 .container {
-  width: 1100px;
-  font-family: "Merriweather", serif;
-  padding: 0 24px;
+  width: 100%;
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+/* pc */
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1100px;
+    align-items: center;
+  }
 }
 
 .error {
@@ -111,15 +127,10 @@
 
 /* 卡片 */
 .card_container {
-  /* display: flex;
-  flex-direction: row; */
-  /* width: 100%; */
-  display: grid;
-  gap: 16px; /* 卡片之間的間距 */
-  grid-template-columns: repeat(
-    auto-fill,
-    minmax(200px, 1fr)
-  ); /* 初始設置為自適應 */
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  gap: 16px;
 }
 .card {
   width: 100%;
@@ -159,8 +170,8 @@
 }
 .card_bg {
   background: #c3ded8;
-  width: 124px;
-  height: 124px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   display: flex;
   align-self: center;
@@ -278,17 +289,71 @@
   outline: none;
 }
 
-/* 大屏幕時的設置，顯示 5-6 張卡片 */
-@media (min-width: 1024px) {
-  .card_container {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
+/* loader */
+.lds_ellipsis,
+.lds_ellipsis div {
+}
+.lds_ellipsis {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.lds_ellipsis div {
+  position: absolute;
+  top: 33.33333px;
+  width: 13.33333px;
+  height: 13.33333px;
+  border-radius: 50%;
+  background: #008f71;
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+.lds_ellipsis div:nth-child(1) {
+  left: 8px;
+  animation: lds_ellipsis1 0.6s infinite;
+}
+.lds_ellipsis div:nth-child(2) {
+  left: 8px;
+  animation: lds_ellipsis2 0.6s infinite;
+}
+.lds_ellipsis div:nth-child(3) {
+  left: 32px;
+  animation: lds_ellipsis2 0.6s infinite;
+}
+.lds_ellipsis div:nth-child(4) {
+  left: 56px;
+  animation: lds_ellipsis3 0.6s infinite;
+}
+@keyframes lds_ellipsis1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes lds_ellipsis3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+@keyframes lds_ellipsis2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(24px, 0);
   }
 }
 
 /* 中屏幕（md）時的設置，顯示兩行，每行 3 張卡片 */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
+  .container {
+    /* background-color: orange; */
+  }
   .main_temp {
     font-size: 48px;
     width: 40%;
@@ -301,12 +366,8 @@
   .subtitle_container {
     padding: 20px 0;
   }
-  .container {
-    width: 100%;
-    padding: 32px;
-    overflow: hidden;
-  }
   .card_container {
+    display: grid;
     grid-template-columns: repeat(3, 1fr); /* 中屏幕時每行顯示 3 張卡片 */
   }
   .sticker {
@@ -317,9 +378,10 @@
 /* 小屏幕（sm）時的設置，每行顯示 2 張卡片 */
 @media (max-width: 576px) {
   .container {
-    padding: 24px;
+    /* background-color: yellow; */
   }
   .card_container {
+    display: grid;
     grid-template-columns: repeat(2, 1fr); /* 小屏幕時每行顯示 2 張卡片 */
   }
   .subtitle_container {
@@ -331,7 +393,6 @@
   .main_container {
     display: flex;
     flex-direction: column;
-    /* margin-bottom: 40px; */
     height: 20%;
   }
   .main_temp {
